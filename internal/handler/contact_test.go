@@ -57,7 +57,9 @@ func TestContactHandler_MissingFields(t *testing.T) {
 			}
 
 			var resp ContactResponse
-			json.NewDecoder(rr.Body).Decode(&resp)
+			if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+				t.Fatalf("Failed to decode response: %v", err)
+			}
 			if resp.Success {
 				t.Errorf("ContactHandler() success = true, want false")
 			}
