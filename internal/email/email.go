@@ -25,6 +25,33 @@ type SMTPConfig struct {
 	FromName string
 }
 
+// loginAuth implements smtp.Auth for LOGIN authentication
+type loginAuth struct {
+	username, password string
+}
+
+func LoginAuth(username, password string) smtp.Auth {
+	return &loginAuth{username, password}
+}
+
+func (a *loginAuth) Start(_ *smtp.ServerInfo) (string, []byte, error) {
+	return "LOGIN", []byte{}, nil
+}
+
+func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	if more {
+		switch string(fromServer) {
+		case "Username:":
+			return []byte(a.username), nil
+		case "Password:":
+			return []byte(a.password), nil
+		default:
+			return nil, fmt.Errorf("unknown LOGIN challenge: %s", fromServer)
+		}
+	}
+	return nil, nil
+}
+
 func getConfig() SMTPConfig {
 	return SMTPConfig{
 		Host:     os.Getenv("SMTP_HOST"),
@@ -96,8 +123,8 @@ func sendWithTLS(config SMTPConfig, to string, msg []byte, addr string) error {
 	}
 	defer client.Close()
 
-	// Authenticate
-	auth := smtp.PlainAuth("", config.User, config.Password, config.Host)
+	// Use LOGIN auth (more widely supported by providers like Purelymail)
+	auth := LoginAuth(config.User, config.Password)
 	if err := client.Auth(auth); err != nil {
 		return fmt.Errorf("SMTP auth failed: %w", err)
 	}
@@ -144,8 +171,8 @@ func sendWithSTARTTLS(config SMTPConfig, to string, msg []byte, addr string) err
 		return fmt.Errorf("STARTTLS failed: %w", err)
 	}
 
-	// Authenticate
-	auth := smtp.PlainAuth("", config.User, config.Password, config.Host)
+	// Use LOGIN auth (more widely supported by providers like Purelymail)
+	auth := LoginAuth(config.User, config.Password)
 	if err := client.Auth(auth); err != nil {
 		return fmt.Errorf("SMTP auth failed: %w", err)
 	}
