@@ -88,16 +88,20 @@ func ContactHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Contact form submitted successfully from %s <%s>", req.Name, req.Email)
 
-	json.NewEncoder(w).Encode(ContactResponse{
+	if err := json.NewEncoder(w).Encode(ContactResponse{
 		Success: true,
 		Message: "Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.",
-	})
+	}); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
 
 func sendError(w http.ResponseWriter, message string, status int) {
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(ContactResponse{
+	if err := json.NewEncoder(w).Encode(ContactResponse{
 		Success: false,
 		Message: message,
-	})
+	}); err != nil {
+		log.Printf("Failed to encode error response: %v", err)
+	}
 }
