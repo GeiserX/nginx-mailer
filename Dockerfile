@@ -15,7 +15,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /mailer ./cmd/mailer
 # Final stage
 FROM nginx:1.29-alpine
 
-RUN apk add --no-cache supervisor
+RUN apk add --no-cache supervisor curl
 
 COPY --from=builder /mailer /usr/local/bin/mailer
 
@@ -29,6 +29,6 @@ RUN mkdir -p /usr/share/nginx/html
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
+    CMD curl -f http://localhost/health || exit 1
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
