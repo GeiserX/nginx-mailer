@@ -71,6 +71,10 @@ func SendContactEmail(data ContactEmail) error {
 		return fmt.Errorf("CONTACT_EMAIL not configured")
 	}
 
+	// Log SMTP config (password obfuscated)
+	fmt.Printf("SMTP Config: host=%s, port=%s, user=%s, from=%s, to=%s\n",
+		config.Host, config.Port, config.User, config.From, to)
+
 	subject := fmt.Sprintf("Nuevo contacto desde web: %s", data.Name)
 
 	// Build HTML body
@@ -111,23 +115,49 @@ func sendWithTLS(config SMTPConfig, to string, msg []byte, addr string) error {
 		ServerName: config.Host,
 	}
 
+	// Try PLAIN auth first
 	conn, err := tls.Dial("tcp", addr, tlsConfig)
 	if err != nil {
 		return fmt.Errorf("TLS dial failed: %w", err)
 	}
-	defer conn.Close()
 
 	client, err := smtp.NewClient(conn, config.Host)
 	if err != nil {
+		conn.Close()
 		return fmt.Errorf("SMTP client creation failed: %w", err)
 	}
-	defer client.Close()
 
-	// Use LOGIN auth (more widely supported by providers like Purelymail)
-	auth := LoginAuth(config.User, config.Password)
-	if err := client.Auth(auth); err != nil {
-		return fmt.Errorf("SMTP auth failed: %w", err)
+	// Try PLAIN auth first (most common)
+	plainAuth := smtp.PlainAuth("", config.User, config.Password, config.Host)
+	authErr := client.Auth(plainAuth)
+	
+	if authErr != nil {
+		// PLAIN failed, close and try LOGIN
+		client.Close()
+		conn.Close()
+		
+		// Reconnect for LOGIN auth attempt
+		conn, err = tls.Dial("tcp", addr, tlsConfig)
+		if err != nil {
+			return fmt.Errorf("TLS dial failed on retry: %w", err)
+		}
+		
+		client, err = smtp.NewClient(conn, config.Host)
+		if err != nil {
+			conn.Close()
+			return fmt.Errorf("SMTP client creation failed on retry: %w", err)
+		}
+		
+		loginAuth := LoginAuth(config.User, config.Password)
+		if err := client.Auth(loginAuth); err != nil {
+			client.Close()
+			conn.Close()
+			return fmt.Errorf("SMTP auth failed (tried PLAIN: %v, LOGIN: %w)", authErr, err)
+		}
 	}
+	
+	defer client.Close()
+	defer conn.Close()
 
 	// Send email
 	if err := client.Mail(config.From); err != nil {
@@ -171,10 +201,14 @@ func sendWithSTARTTLS(config SMTPConfig, to string, msg []byte, addr string) err
 		return fmt.Errorf("STARTTLS failed: %w", err)
 	}
 
-	// Use LOGIN auth (more widely supported by providers like Purelymail)
-	auth := LoginAuth(config.User, config.Password)
-	if err := client.Auth(auth); err != nil {
-		return fmt.Errorf("SMTP auth failed: %w", err)
+	// Try PLAIN auth first
+	plainAuth := smtp.PlainAuth("", config.User, config.Password, config.Host)
+	if err := client.Auth(plainAuth); err != nil {
+		// Try LOGIN as fallback
+		loginAuth := LoginAuth(config.User, config.Password)
+		if err := client.Auth(loginAuth); err != nil {
+			return fmt.Errorf("SMTP auth failed: %w", err)
+		}
 	}
 
 	// Send email
