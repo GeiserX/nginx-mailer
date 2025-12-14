@@ -1,0 +1,25 @@
+# Example docker-compose for static websites with contact form
+# Adjust paths and settings for your deployment
+
+services:
+  website:
+    image: drumsergio/nginx-mailer:latest
+    ports:
+      - "80:80"
+    volumes:
+      - /path/to/your/website:/usr/share/nginx/html:ro
+    environment:
+      # SMTP Configuration
+      - SMTP_HOST=smtp.example.com
+      - SMTP_PORT=465
+      - SMTP_USER=noreply@example.com
+      - SMTP_PASSWORD=your-smtp-password
+      - SMTP_FROM=noreply@example.com
+      - SMTP_FROM_NAME=My Website
+      
+      # Destination email for contact form
+      - CONTACT_EMAIL=contact@example.com
+      
+      # Cloudflare Turnstile CAPTCHA (optional - leave empty to disable)
+      - CLOUDFLARE_TURNSTILE_SECRET_KEY=
+    restart: unless-stopped

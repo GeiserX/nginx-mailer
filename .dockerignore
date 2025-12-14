@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+LICENSE
+docs/
+
+# CI/CD
+.github/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test files
+*_test.go
+coverage.out
+
+# Example files
+example-site/
+docker-compose.example.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
