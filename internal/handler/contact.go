@@ -36,8 +36,22 @@ func ContactHandler(w http.ResponseWriter, r *http.Request) {
 			sendError(w, "Error parsing request", http.StatusBadRequest)
 			return
 		}
+	} else if strings.Contains(contentType, "multipart/form-data") {
+		// Multipart form data (from FormData in JS)
+		if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max
+			sendError(w, "Error parsing multipart form", http.StatusBadRequest)
+			return
+		}
+		req = ContactRequest{
+			Name:      r.FormValue("nombre"),
+			Phone:     r.FormValue("telefono"),
+			Email:     r.FormValue("email"),
+			Location:  r.FormValue("ubicacion"),
+			Message:   r.FormValue("mensaje"),
+			Turnstile: r.FormValue("cf-turnstile-response"),
+		}
 	} else {
-		// Form data
+		// URL-encoded form data
 		if err := r.ParseForm(); err != nil {
 			sendError(w, "Error parsing form", http.StatusBadRequest)
 			return
