@@ -1,6 +1,16 @@
-# nginx-mailer
+<p align="center"><img src="docs/images/banner.svg" alt="nginx-mailer banner" width="900"/></p>
 
-Lightweight Docker image based on nginx:alpine that serves static websites and handles contact form submissions via SMTP.
+<h1 align="center">nginx-mailer</h1>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/GeiserX/nginx-mailer" alt="License"/></a>
+  <a href="https://hub.docker.com/r/drumsergio/nginx-mailer"><img src="https://img.shields.io/docker/pulls/drumsergio/nginx-mailer" alt="Docker Pulls"/></a>
+  <a href="https://hub.docker.com/r/drumsergio/nginx-mailer"><img src="https://img.shields.io/docker/image-size/drumsergio/nginx-mailer/latest" alt="Docker Image Size"/></a>
+</p>
+
+<p align="center"><strong>Lightweight Docker image based on nginx:alpine that serves static websites and handles contact form submissions via SMTP.</strong></p>
+
+---
 
 ## Features
 
