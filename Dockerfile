@@ -13,7 +13,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /mailer ./cmd/mailer
 
 # Final stage
-FROM nginx:1.29-alpine
+FROM nginx:1.31-alpine
 
 RUN apk add --no-cache supervisor curl
 
