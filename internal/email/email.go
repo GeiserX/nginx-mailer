@@ -123,7 +123,7 @@ func sendWithTLS(config SMTPConfig, to string, msg []byte, addr string) error {
 
 	client, err := smtp.NewClient(conn, config.Host)
 	if err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return fmt.Errorf("SMTP client creation failed: %w", err)
 	}
 
@@ -133,8 +133,8 @@ func sendWithTLS(config SMTPConfig, to string, msg []byte, addr string) error {
 
 	if authErr != nil {
 		// PLAIN failed, close and try LOGIN
-		client.Close()
-		conn.Close()
+		_ = client.Close()
+		_ = conn.Close()
 
 		// Reconnect for LOGIN auth attempt
 		conn, err = tls.Dial("tcp", addr, tlsConfig)
@@ -144,20 +144,20 @@ func sendWithTLS(config SMTPConfig, to string, msg []byte, addr string) error {
 
 		client, err = smtp.NewClient(conn, config.Host)
 		if err != nil {
-			conn.Close()
+			_ = conn.Close()
 			return fmt.Errorf("SMTP client creation failed on retry: %w", err)
 		}
 
 		loginAuth := LoginAuth(config.User, config.Password)
 		if err := client.Auth(loginAuth); err != nil {
-			client.Close()
-			conn.Close()
+			_ = client.Close()
+			_ = conn.Close()
 			return fmt.Errorf("SMTP auth failed (tried PLAIN: %v, LOGIN: %w)", authErr, err)
 		}
 	}
 
-	defer client.Close()
-	defer conn.Close()
+	defer func() { _ = client.Close() }()
+	defer func() { _ = conn.Close() }()
 
 	// Send email
 	if err := client.Mail(config.From); err != nil {
@@ -191,7 +191,7 @@ func sendWithSTARTTLS(config SMTPConfig, to string, msg []byte, addr string) err
 	if err != nil {
 		return fmt.Errorf("SMTP dial failed: %w", err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	// STARTTLS
 	tlsConfig := &tls.Config{
@@ -264,39 +264,39 @@ func buildEmailBody(data ContactEmail) string {
         <div class="content">
 `)
 
-	sb.WriteString(fmt.Sprintf(`            <div class="field">
+	fmt.Fprintf(&sb, `            <div class="field">
                 <div class="label">Nombre:</div>
                 <div class="value">%s</div>
             </div>
-`, escapeHTML(data.Name)))
+`, escapeHTML(data.Name))
 
 	if data.Phone != "" {
-		sb.WriteString(fmt.Sprintf(`            <div class="field">
+		fmt.Fprintf(&sb, `            <div class="field">
                 <div class="label">Teléfono:</div>
                 <div class="value">%s</div>
             </div>
-`, escapeHTML(data.Phone)))
+`, escapeHTML(data.Phone))
 	}
 
-	sb.WriteString(fmt.Sprintf(`            <div class="field">
+	fmt.Fprintf(&sb, `            <div class="field">
                 <div class="label">Email:</div>
                 <div class="value"><a href="mailto:%s">%s</a></div>
             </div>
-`, escapeHTML(data.Email), escapeHTML(data.Email)))
+`, escapeHTML(data.Email), escapeHTML(data.Email))
 
 	if data.Location != "" {
-		sb.WriteString(fmt.Sprintf(`            <div class="field">
+		fmt.Fprintf(&sb, `            <div class="field">
                 <div class="label">Ubicación:</div>
                 <div class="value">%s</div>
             </div>
-`, escapeHTML(data.Location)))
+`, escapeHTML(data.Location))
 	}
 
-	sb.WriteString(fmt.Sprintf(`            <div class="field">
+	fmt.Fprintf(&sb, `            <div class="field">
                 <div class="label">Mensaje:</div>
                 <div class="value">%s</div>
             </div>
-`, escapeHTML(data.Message)))
+`, escapeHTML(data.Message))
 
 	sb.WriteString(`        </div>
         <div class="footer">

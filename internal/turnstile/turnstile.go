@@ -49,7 +49,7 @@ func Verify(token string, remoteIP string) error {
 	if err != nil {
 		return fmt.Errorf("failed to verify turnstile: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Parse response
 	var result VerifyResponse
