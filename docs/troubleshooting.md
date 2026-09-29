@@ -8,7 +8,7 @@ The SMTP send failed; the log line `Failed to send email:` says why. Check that 
 
 ## The form answers "Verificación de seguridad fallida" (HTTP 403)
 
-`CLOUDFLARE_TURNSTILE_SECRET_KEY` is set and the Turnstile check failed: the form sent no `cf-turnstile-response`, or the site key on the page does not belong to the secret key. The log line `Turnstile verification failed:` gives the reason. Leave the variable empty to turn the check off.
+`CLOUDFLARE_TURNSTILE_SECRET_KEY` is set and the Turnstile check failed: the form sent no `cf-turnstile-response`, or the site key on the page does not belong to the secret key. The log line `Turnstile verification failed:` gives the reason. An empty variable turns the check off, which is only for local testing: without it, anyone who finds the endpoint can make the container send mail.
 
 ## The form answers "Nombre, email y mensaje son obligatorios" (HTTP 400)
 
@@ -16,4 +16,4 @@ The request lacks `nombre`, `email` or `mensaje`, or the field names differ from
 
 ## Reporting a bug
 
-Open an issue at https://github.com/GeiserX/nginx-mailer/issues with the image tag, the request you sent, the response, and the container log with the SMTP password removed.
+Open an issue at https://github.com/GeiserX/nginx-mailer/issues with the image tag, the request you sent, the response, and the container log. Remove the SMTP password and any names, email addresses or messages from past submissions first: the log records who submitted the form.

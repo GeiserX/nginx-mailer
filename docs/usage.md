@@ -17,7 +17,7 @@ Accepts JSON, `multipart/form-data` or a URL-encoded form with these fields. `no
 }
 ```
 
-The answer is JSON: `{"success": true, "message": "..."}` on success, `success: false` with a message otherwise. The messages are in Spanish.
+The answer is JSON: `{"success": true, "message": "..."}` on success, `success: false` with a message otherwise. The validation and result messages are in Spanish; request parsing errors are in English.
 
 ### GET /health
 

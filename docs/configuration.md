@@ -11,6 +11,6 @@ All settings are environment variables on the container.
 | `SMTP_FROM` | Yes | From email address |
 | `SMTP_FROM_NAME` | No | From display name |
 | `CONTACT_EMAIL` | Yes | Recipient email for contact forms |
-| `CLOUDFLARE_TURNSTILE_SECRET_KEY` | No | Turnstile secret key; when empty, the CAPTCHA check is skipped |
+| `CLOUDFLARE_TURNSTILE_SECRET_KEY` | No | Turnstile secret key; when empty, the CAPTCHA check is skipped, so set it on any public site |
 
 Mount your site at `/usr/share/nginx/html` (read-only is fine). nginx serves it on port 80.
