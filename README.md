@@ -3,24 +3,25 @@
 <h1 align="center">nginx-mailer</h1>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/GeiserX/nginx-mailer" alt="License"/></a>
+  <a href="https://github.com/GeiserX/nginx-mailer/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/GeiserX/nginx-mailer/ci.yml?label=CI" alt="CI"/></a>
+  <a href="https://github.com/GeiserX/nginx-mailer/blob/main/LICENSE"><img src="https://img.shields.io/github/license/GeiserX/nginx-mailer" alt="License"/></a>
   <a href="https://hub.docker.com/r/drumsergio/nginx-mailer"><img src="https://img.shields.io/docker/pulls/drumsergio/nginx-mailer" alt="Docker Pulls"/></a>
-  <a href="https://hub.docker.com/r/drumsergio/nginx-mailer"><img src="https://img.shields.io/docker/image-size/drumsergio/nginx-mailer/latest" alt="Docker Image Size"/></a>
 </p>
 
-<p align="center"><strong>Lightweight Docker image based on nginx:alpine that serves static websites and handles contact form submissions via SMTP.</strong></p>
+<p align="center"><strong>Docker image based on nginx:alpine that serves a static site and sends its contact form by SMTP, with optional Cloudflare Turnstile.</strong></p>
 
 ---
 
 ## Features
 
-- 🚀 Based on `nginx:1.29-alpine` (~35MB total)
-- 📧 Built-in contact form API with SMTP support
-- 🔒 Cloudflare Turnstile CAPTCHA integration
-- 🐳 Single container (nginx + Go API)
-- 🏗️ Multi-arch: `linux/amd64` and `linux/arm64`
+- Serves a static site from a mounted folder with nginx on port 80.
+- Contact form endpoint `POST /api/contact` that emails each submission to one address.
+- SMTP over TLS (port 465) or STARTTLS (other ports).
+- Optional Cloudflare Turnstile CAPTCHA check.
+- One container: nginx and the Go mail service run under supervisord.
+- `linux/amd64` image on Docker Hub.
 
-## Quick Start
+## Quick start
 
 ```bash
 docker run -d \
@@ -35,77 +36,15 @@ docker run -d \
   drumsergio/nginx-mailer:1.0.0
 ```
 
-## Docker Compose
+The site is served on port 80, with `/api/contact` and `/health` behind nginx. Compose and every variable are in [Getting started](https://github.com/GeiserX/nginx-mailer/blob/main/docs/getting-started.md).
 
-```yaml
-services:
-  website:
-    image: drumsergio/nginx-mailer:1.0.0
-    ports:
-      - "80:80"
-    volumes:
-      - ./website:/usr/share/nginx/html:ro
-    environment:
-      - SMTP_HOST=smtp.example.com
-      - SMTP_PORT=465
-      - SMTP_USER=noreply@example.com
-      - SMTP_PASSWORD=your-password
-      - SMTP_FROM=noreply@example.com
-      - SMTP_FROM_NAME=My Website
-      - CONTACT_EMAIL=you@example.com
-      - CLOUDFLARE_TURNSTILE_SECRET_KEY=  # Optional
-    restart: unless-stopped
-```
+## Documentation
 
-## Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `SMTP_HOST` | Yes | SMTP server hostname |
-| `SMTP_PORT` | Yes | SMTP port (465 for SSL, 587 for STARTTLS) |
-| `SMTP_USER` | Yes | SMTP username |
-| `SMTP_PASSWORD` | Yes | SMTP password |
-| `SMTP_FROM` | Yes | From email address |
-| `SMTP_FROM_NAME` | No | From display name |
-| `CONTACT_EMAIL` | Yes | Recipient email for contact forms |
-| `CLOUDFLARE_TURNSTILE_SECRET_KEY` | No | Turnstile secret key |
-
-## API
-
-### POST /api/contact
-
-```json
-{
-  "nombre": "John Doe",
-  "email": "john@example.com",
-  "telefono": "+1234567890",
-  "ubicacion": "City",
-  "mensaje": "Hello...",
-  "cf-turnstile-response": "token"
-}
-```
-
-### GET /health
-
-Returns `200 OK` for health checks.
-
-## HTML Form Example
-
-```html
-<form action="/api/contact" method="POST">
-  <input type="text" name="nombre" placeholder="Name" required>
-  <input type="email" name="email" placeholder="Email" required>
-  <input type="tel" name="telefono" placeholder="Phone">
-  <textarea name="mensaje" placeholder="Message" required></textarea>
-  
-  <!-- Optional: Cloudflare Turnstile -->
-  <div class="cf-turnstile" data-sitekey="your-site-key"></div>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  
-  <button type="submit">Send</button>
-</form>
-```
+- [Getting started](https://github.com/GeiserX/nginx-mailer/blob/main/docs/getting-started.md): `docker run`, Docker Compose, and the health check
+- [Configuration](https://github.com/GeiserX/nginx-mailer/blob/main/docs/configuration.md): every environment variable
+- [Usage](https://github.com/GeiserX/nginx-mailer/blob/main/docs/usage.md): the contact API and an HTML form example
+- [Troubleshooting](https://github.com/GeiserX/nginx-mailer/blob/main/docs/troubleshooting.md): SMTP and Turnstile failures, and what to put in a bug report
 
 ## License
 
-GPL-3.0-or-later. See [LICENSE](LICENSE).
+[GPL-3.0-or-later](https://github.com/GeiserX/nginx-mailer/blob/main/LICENSE)
