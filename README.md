@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/images/banner.svg" alt="nginx-mailer banner" width="900"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/GeiserX/nginx-mailer/main/docs/images/banner.svg" alt="nginx-mailer banner" width="900"/></p>
 
 <h1 align="center">nginx-mailer</h1>
 
