@@ -3,7 +3,7 @@
 
 services:
   website:
-    image: drumsergio/nginx-mailer:latest
+    image: drumsergio/nginx-mailer:1.0.0
     ports:
       - "80:80"
     volumes:
