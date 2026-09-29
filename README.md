@@ -32,7 +32,7 @@ docker run -d \
   -e SMTP_PASSWORD=your-password \
   -e SMTP_FROM=noreply@example.com \
   -e CONTACT_EMAIL=you@example.com \
-  drumsergio/nginx-mailer:latest
+  drumsergio/nginx-mailer:1.0.0
 ```
 
 ## Docker Compose
@@ -40,7 +40,7 @@ docker run -d \
 ```yaml
 services:
   website:
-    image: drumsergio/nginx-mailer:latest
+    image: drumsergio/nginx-mailer:1.0.0
     ports:
       - "80:80"
     volumes:
