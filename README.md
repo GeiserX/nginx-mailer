@@ -108,4 +108,4 @@ Returns `200 OK` for health checks.
 
 ## License
 
-MIT
+GPL-3.0-or-later. See [LICENSE](LICENSE).
