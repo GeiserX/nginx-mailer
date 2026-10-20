@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.27-alpine AS builder
+FROM golang:1.27.3-alpine AS builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /mailer ./cmd/mailer
 # Final stage
 FROM nginx:1.31-alpine
 
-RUN apk add --no-cache supervisor curl
+RUN apk upgrade --no-cache ca-certificates ca-certificates-bundle && apk add --no-cache supervisor curl
 
 COPY --from=builder /mailer /usr/local/bin/mailer
 
