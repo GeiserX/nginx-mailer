@@ -15,7 +15,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /mailer ./cmd/mailer
 # Final stage
 FROM nginx:1.31-alpine
 
-RUN apk upgrade --no-cache ca-certificates ca-certificates-bundle && apk add --no-cache supervisor curl
+RUN apk add --no-cache 'ca-certificates>=20261020-r0' 'ca-certificates-bundle>=20261020-r0' supervisor curl
 
 COPY --from=builder /mailer /usr/local/bin/mailer
 
