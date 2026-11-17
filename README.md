@@ -33,7 +33,7 @@ docker run -d \
   -e SMTP_PASSWORD=your-password \
   -e SMTP_FROM=noreply@example.com \
   -e CONTACT_EMAIL=you@example.com \
-  drumsergio/nginx-mailer:1.0.0
+  drumsergio/nginx-mailer:1.0.2
 ```
 
 The site is served on port 80, with `/api/contact` and `/health` behind nginx. Compose and every variable are in [Getting started](https://github.com/GeiserX/nginx-mailer/blob/main/docs/getting-started.md).
