@@ -14,7 +14,7 @@ docker run -d \
   -e SMTP_PASSWORD=your-password \
   -e SMTP_FROM=noreply@example.com \
   -e CONTACT_EMAIL=you@example.com \
-  drumsergio/nginx-mailer:1.0.0
+  drumsergio/nginx-mailer:1.0.2
 ```
 
 ## Docker Compose
@@ -24,7 +24,7 @@ The same setup as a compose file (also in [`docker-compose.example.yml`](https:/
 ```yaml
 services:
   website:
-    image: drumsergio/nginx-mailer:1.0.0
+    image: drumsergio/nginx-mailer:1.0.2
     ports:
       - "80:80"
     volumes:
